@@ -1,7 +1,7 @@
 """Pytest module for testing the rest client."""
 import pytest
 
-from pypaca.rest.client import RestClient
+from pypaca.rest.rest import RestClient
 
 
 def test_rest_client():

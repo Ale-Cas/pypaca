@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]  # https://python-poetry.org/docs/pyproject/
 name = "pypaca"
-version = "0.0.0"
+version = "0.0.1"
 description = "A fully typed Python client for Alpaca APIs"
 authors = ["Alessio Castrica <castricaalessio@gmail.com>"]
 readme = "README.md"
