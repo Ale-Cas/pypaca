@@ -1,17 +1,16 @@
 """Rest client."""
 import base64
 import time
-from collections.abc import Iterator
-from itertools import chain
 
 from pydantic import BaseModel
 from requests import Session
 from requests.exceptions import HTTPError
 
 from pypaca import __version__
-from pypaca.rest.enums import BaseURL, PaginationType
+from pypaca.rest.credentials import Credentials
+from pypaca.rest.enums import BaseURL
 from pypaca.rest.exceptions import APIError, RetryError
-from pypaca.rest.types import Credentials, HTTPResult, PageItem, RawData
+from pypaca.rest.types import HTTPResult, RawData
 
 
 class RestClient:
@@ -19,16 +18,16 @@ class RestClient:
 
     def __init__(  # noqa: PLR0913
         self,
-        base_url: BaseURL | str,
+        base_url: BaseURL,
         api_key: str | None = None,
         secret_key: str | None = None,
         oauth_token: str | None = None,
         use_basic_auth: bool = False,
         api_version: str = "v2",
-        sandbox: bool = False,
+        sandbox: bool = True,
         retry_attempts: int = 3,
         retry_wait_seconds: int = 3,
-        retry_exception_codes: tuple[int] = (429, 504),
+        retry_exception_codes: tuple[int, ...] = (429, 504),
     ) -> None:
         """Abstract base class for REST clients. Handles submitting HTTP requests to Alpaca API endpoints.
 
@@ -46,34 +45,38 @@ class RestClient:
             retry_wait_seconds (Optional[int]): The number of seconds to wait between requests before retrying.
             retry_exception_codes (Optional[List[int]]): The API exception codes to retry a request on.
         """
-        self._api_key, self._secret_key, self._oauth_token = self._validate_credentials(
-            api_key, secret_key, oauth_token
+        if not (api_key or secret_key or oauth_token):
+            credentials = Credentials()
+        if oauth_token:
+            if api_key or secret_key:
+                raise ValueError(
+                    "Either an oauth_token or an api_key may be supplied, but not both"
+                )
+            credentials = Credentials(oauth_token=oauth_token)
+        else:
+            if api_key and not secret_key or secret_key and not api_key:
+                raise ValueError("You must provide both the `api_key` and `secret_key`")
+            if api_key and secret_key:
+                credentials = Credentials(api_key=api_key, secret_key=secret_key)
+        self._api_key, self._secret_key, self._oauth_token = (
+            credentials.api_key,
+            credentials.secret_key,
+            credentials.oauth_token,
         )
         self._api_version: str = api_version
         self._base_url: BaseURL | str = base_url
         self._sandbox: bool = sandbox
         self._use_basic_auth: bool = use_basic_auth
         self._session: Session = Session()
-
-        # setting up request retry configurations
         self._retry = retry_attempts
         self._retry_wait = retry_wait_seconds
         self._retry_codes = retry_exception_codes
-
-        if retry_attempts and retry_attempts > 0:
-            self._retry = retry_attempts
-
-        if retry_wait_seconds and retry_wait_seconds > 0:
-            self._retry_wait = retry_wait_seconds
-
-        if retry_exception_codes:
-            self._retry_codes = retry_exception_codes
 
     def _request(  # noqa: PLR0913
         self,
         method: str,
         path: str,
-        data: dict | str | None = None,
+        data: RawData = None,
         base_url: BaseURL | str | None = None,
         api_version: str | None = None,
     ) -> HTTPResult:
@@ -168,13 +171,15 @@ class RestClient:
             api_key_secret = f"{self._api_key}:{self._secret_key}".encode()
             encoded_api_key_secret = base64.b64encode(api_key_secret).decode("utf-8")
             headers["Authorization"] = "Basic " + encoded_api_key_secret
-        else:
+        elif self._api_key and self._secret_key:
             headers["APCA-API-KEY-ID"] = self._api_key
             headers["APCA-API-SECRET-KEY"] = self._secret_key
+        else:
+            raise ValueError("Invalid API credentials.")
 
         return headers
 
-    def _one_request(self, method: str, url: str, opts: dict, retry: int) -> dict:
+    def _one_request(self, method: str, url: str, opts: dict, retry: int) -> dict | None:
         """
         Perform one request, possibly raising RetryError in the case the response is 429.
 
@@ -213,7 +218,7 @@ class RestClient:
             return response.json()
         return None
 
-    def get(self, path: str, data: dict | str | None = None, **kwargs) -> HTTPResult:
+    def get(self, path: str, data: RawData = None, **kwargs) -> HTTPResult:
         """
         Perform a single GET request.
 
@@ -229,7 +234,7 @@ class RestClient:
         """
         return self._request("GET", path, data, **kwargs)
 
-    def post(self, path: str, data: dict | (list[dict] | str) | None = None) -> HTTPResult:
+    def post(self, path: str, data: RawData = None) -> HTTPResult:
         """
         Perform a single POST request.
 
@@ -245,7 +250,7 @@ class RestClient:
         """
         return self._request("POST", path, data)
 
-    def put(self, path: str, data: dict | str | None = None) -> dict:
+    def put(self, path: str, data: RawData = None) -> HTTPResult:
         """
         Perform a single PUT request.
 
@@ -261,7 +266,7 @@ class RestClient:
         """
         return self._request("PUT", path, data)
 
-    def patch(self, path: str, data: dict | str | None = None) -> dict:
+    def patch(self, path: str, data: RawData = None) -> HTTPResult:
         """
         Perform a single PATCH request.
 
@@ -277,7 +282,7 @@ class RestClient:
         """
         return self._request("PATCH", path, data)
 
-    def delete(self, path, data: dict | str | None = None) -> dict:
+    def delete(self, path, data: RawData = None) -> HTTPResult:
         """
         Perform a single DELETE request.
 
@@ -292,10 +297,7 @@ class RestClient:
         """
         return self._request("DELETE", path, data)
 
-    # TODO: Refactor to be able to handle both parsing to types and parsing to collections of types (parse_as_obj)
-    def response_wrapper(
-        self, model: type[BaseModel], raw_data: RawData, **kwargs
-    ) -> BaseModel | RawData:
+    def response_wrapper(self, model: type[BaseModel], raw_data: RawData, **kwargs) -> BaseModel:
         """
         Wrap the response from the API.
 
@@ -314,64 +316,3 @@ class RestClient:
             Union[BaseModel, RawData]: either raw or parsed data
         """
         return model(raw_data=raw_data, **kwargs)
-
-    @staticmethod
-    def _validate_pagination(
-        max_items_limit: int | None, handle_pagination: PaginationType | None
-    ) -> PaginationType:
-        """Private method for validating the max_items_limit and handle_pagination arguments."""
-        if handle_pagination is None:
-            handle_pagination = PaginationType.FULL
-
-        if handle_pagination != PaginationType.FULL and max_items_limit is not None:
-            raise ValueError("max_items_limit can only be specified for PaginationType.FULL")
-        return handle_pagination
-
-    @staticmethod
-    def _return_paginated_result(
-        iterator: Iterator[PageItem], handle_pagination: PaginationType
-    ) -> list[PageItem] | Iterator[list[PageItem]]:
-        """Private method for converting an iterator that yields results to the proper pagination type result."""
-        if handle_pagination == PaginationType.NONE:
-            # user wants no pagination, so just do a single page
-            return next(iterator)
-        if handle_pagination == PaginationType.FULL:
-            # the iterator returns "pages", so we use chain to flatten them all into 1 list
-            return list(chain.from_iterable(iterator))
-        if handle_pagination == PaginationType.ITERATOR:
-            return iterator
-        raise ValueError(f"Invalid pagination type: {handle_pagination}.")
-
-    @staticmethod
-    def _validate_credentials(
-        api_key: str | None = None,
-        secret_key: str | None = None,
-        oauth_token: str | None = None,
-    ) -> Credentials:
-        """
-        Gather API credentials from parameters and environment variables, and validates them.
-
-        Parameters
-        ----------
-            api_key (Optional[str]): The API key for authentication. Defaults to None.
-            secret_key (Optional[str]): The secret key for authentication. Defaults to None.
-            oauth_token (Optional[str]): The oauth token if authenticating via OAuth. Defaults to None.
-
-        Raises
-        ------
-             ValueError: If the combination of keys and tokens provided are not valid.
-
-        Returns
-        -------
-            Credentials: The set of validated authentication keys
-        """
-        if not oauth_token and not api_key:
-            raise ValueError("You must supply a method of authentication")
-
-        if oauth_token and (api_key or secret_key):
-            raise ValueError("Either an oauth_token or an api_key may be supplied, but not both")
-
-        if not oauth_token and not (api_key and secret_key):
-            raise ValueError("A corresponding secret_key must be supplied with the api_key")
-
-        return api_key, secret_key, oauth_token

@@ -1,0 +1,62 @@
+interactions:
+- request:
+    body: '{"dtbp_check": null, "fractional_trading": true, "max_margin_multiplier":
+      null, "no_shorting": null, "pdt_check": null, "suspend_trade": null, "trade_confirm_email":
+      "none", "ptp_no_exception_entry": null}'
+    headers:
+      APCA-API-KEY-ID:
+      - SECRET
+      APCA-API-SECRET-KEY:
+      - SECRET
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '205'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - APCA-PY/0.0.1
+    method: PATCH
+    uri: https://paper-api.alpaca.markets/v2/account/configurations
+  response:
+    body:
+      string: '{"dtbp_check":"both","fractional_trading":true,"max_margin_multiplier":"1","no_shorting":true,"pdt_check":"both","ptp_no_exception_entry":false,"suspend_trade":false,"trade_confirm_email":"none"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Apca-Api-Key-Id, Apca-Api-Secret-Key, Authorization
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS, PUT, DELETE, POST, PATCH
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '1728000'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '195'
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 05 Nov 2023 17:10:18 GMT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      X-Ratelimit-Limit:
+      - '200'
+      X-Ratelimit-Remaining:
+      - '199'
+      X-Ratelimit-Reset:
+      - '1699204218'
+      X-Request-Id:
+      - 0d8aa573ecdf9fd6fc562b8ecb260b6e
+    status:
+      code: 200
+      message: OK
+version: 1

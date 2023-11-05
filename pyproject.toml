@@ -18,8 +18,12 @@ version = "0.0.0"
 version_files = ["pyproject.toml:version"]
 
 [tool.poetry.dependencies]  # https://python-poetry.org/docs/dependency-specification/
-pydantic = ">=1.10.7"
-python = ">=3.10,<4.0"
+python = ">=3.9,<3.13"
+pydantic = ">=1.10.7, <3.0.0"
+pydantic-settings = "^2.0.3"
+sseclient = "^0.0.27"
+requests = "^2.31.0"
+pandas = "^2.1.2"
 
 [tool.poetry.group.test.dependencies]  # https://python-poetry.org/docs/master/managing-dependencies/
 black = ">=23.3.0"
@@ -33,6 +37,8 @@ pytest-clarity = ">=1.0.1"
 pytest-mock = ">=3.10.0"
 pytest-xdist = ">=3.2.1"
 ruff = ">=0.0.270"
+pytest-vcr = "^1.0.2"
+vcrpy = "^5.1.0"
 
 [tool.poetry.group.dev.dependencies]  # https://python-poetry.org/docs/master/managing-dependencies/
 cruft = ">=2.14.0"

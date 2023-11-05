@@ -96,8 +96,8 @@ class APIError(Exception):
     @property
     def body(self) -> ErrorBody | RawData:
         """Return the body of the response."""
-        _body: RawData = json.loads(self.response.content)
-        _models: list[ErrorBody] = [
+        _body: dict = json.loads(self.response.content)
+        _models: list[type[ErrorBody]] = [
             ErrorBody,
             BuyingPowerErrorBody,
             PDTErrorBody,
@@ -116,7 +116,7 @@ class APIError(Exception):
         if isinstance(self.body, ErrorBody):
             return self.body.code
         if isinstance(self.body, dict):
-            return int(self.body.get("code"))
+            return int(self.body.get("code", None))
         return int(json.loads(self.response.content)["code"])
 
 
