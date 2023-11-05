@@ -41,6 +41,9 @@ jobs:
         run: devcontainer exec --workspace-folder . poe lint
 
       - name: Test package
+        env:
+          API_KEY: ${{ secrets.API_KEY}}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: devcontainer exec --workspace-folder . poe test
 
       - name: Upload coverage
