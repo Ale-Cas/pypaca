@@ -79,29 +79,29 @@ class USDPositionValues(BaseModel):
 
     Attributes
     ----------
-        avg_entry_price (str): The average entry price of the position.
-        market_value (str): Total dollar amount of the position.
-        cost_basis (str): Total cost basis in dollars.
-        unrealized_pl (str): Unrealized profit/loss in dollars.
-        unrealized_plpc (str): Unrealized profit/loss percent.
-        unrealized_intraday_pl (str): Unrealized profit/loss in dollars for the day.
-        unrealized_intraday_plpc (str): Unrealized profit/loss percent for the day.
-        current_price (str): Current asset price per share.
-        lastday_price (str): Last day's asset price per share based on the closing value of the last trading day.
-        change_today (str): Percent change from last day's price.
+        avg_entry_price (float): The average entry price of the position.
+        market_value (float): Total dollar amount of the position.
+        cost_basis (float): Total cost basis in dollars.
+        unrealized_pl (float): Unrealized profit/loss in dollars.
+        unrealized_plpc (float): Unrealized profit/loss percent.
+        unrealized_intraday_pl (float): Unrealized profit/loss in dollars for the day.
+        unrealized_intraday_plpc (float): Unrealized profit/loss percent for the day.
+        current_price (float): Current asset price per share.
+        lastday_price (float): Last day's asset price per share based on the closing value of the last trading day.
+        change_today (float): Percent change from last day's price.
 
     """
 
-    avg_entry_price: str
-    market_value: str
-    cost_basis: str
-    unrealized_pl: str
-    unrealized_plpc: str
-    unrealized_intraday_pl: str
-    unrealized_intraday_plpc: str
-    current_price: str
-    lastday_price: str
-    change_today: str
+    avg_entry_price: float
+    market_value: float
+    cost_basis: float
+    unrealized_pl: float
+    unrealized_plpc: float
+    unrealized_intraday_pl: float
+    unrealized_intraday_plpc: float
+    current_price: float
+    lastday_price: float
+    change_today: float
 
 
 class Position(BaseModel):
@@ -115,22 +115,22 @@ class Position(BaseModel):
         exchange (AssetExchange): Exchange name of the asset.
         asset_class (AssetClass): Name of the asset's asset class.
         asset_marginable (Optional[bool]): Indicates if this asset is marginable.
-        avg_entry_price (str): The average entry price of the position.
-        qty (str): The number of shares of the position.
+        avg_entry_price (float): The average entry price of the position.
+        qty (float): The number of shares of the position.
         side (PositionSide): "long" or "short" representing the side of the position.
-        market_value (Optional[str]): Total dollar amount of the position.
-        cost_basis (str): Total cost basis in dollars.
-        unrealized_pl (Optional[str]): Unrealized profit/loss in dollars.
-        unrealized_plpc (Optional[str]): Unrealized profit/loss percent.
-        unrealized_intraday_pl (Optional[str]): Unrealized profit/loss in dollars for the day.
-        unrealized_intraday_plpc (Optional[str]): Unrealized profit/loss percent for the day.
-        current_price (Optional[str]): Current asset price per share.
-        lastday_price (Optional[str]): Last day's asset price per share based on the closing value of the last trading day.
-        change_today (Optional[str]): Percent change from last day's price.
-        swap_rate (Optional[str]): Swap rate is the exchange rate (without mark-up) used to convert the price into local currency or crypto asset.
-        avg_entry_swap_rate (Optional[str]): The average exchange rate the price was converted into the local currency at.
+        market_value (Optional[float]): Total dollar amount of the position.
+        cost_basis (float): Total cost basis in dollars.
+        unrealized_pl (Optional[float]): Unrealized profit/loss in dollars.
+        unrealized_plpc (Optional[float]): Unrealized profit/loss percent.
+        unrealized_intraday_pl (Optional[float]): Unrealized profit/loss in dollars for the day.
+        unrealized_intraday_plpc (Optional[float]): Unrealized profit/loss percent for the day.
+        current_price (Optional[float]): Current asset price per share.
+        lastday_price (Optional[float]): Last day's asset price per share based on the closing value of the last trading day.
+        change_today (Optional[float]): Percent change from last day's price.
+        swap_rate (Optional[float]): Swap rate is the exchange rate (without mark-up) used to convert the price into local currency or crypto asset.
+        avg_entry_swap_rate (Optional[float]): The average exchange rate the price was converted into the local currency at.
         usd (USDPositionValues): Represents the position in USD values.
-        qty_available (Optional[str]): Total number of shares available minus open orders.
+        qty_available (Optional[float]): Total number of shares available minus open orders.
 
     """
 
@@ -139,22 +139,22 @@ class Position(BaseModel):
     exchange: AssetExchange
     asset_class: AssetClass
     asset_marginable: bool | None = None
-    avg_entry_price: str
-    qty: str
+    avg_entry_price: float
+    qty: float
     side: PositionSide
-    market_value: str | None = None
-    cost_basis: str
-    unrealized_pl: str | None = None
-    unrealized_plpc: str | None = None
-    unrealized_intraday_pl: str | None = None
-    unrealized_intraday_plpc: str | None = None
-    current_price: str | None = None
-    lastday_price: str | None = None
-    change_today: str | None = None
-    swap_rate: str | None = None
-    avg_entry_swap_rate: str | None = None
+    market_value: float | None = None
+    cost_basis: float
+    unrealized_pl: float | None = None
+    unrealized_plpc: float | None = None
+    unrealized_intraday_pl: float | None = None
+    unrealized_intraday_plpc: float | None = None
+    current_price: float | None = None
+    lastday_price: float | None = None
+    change_today: float | None = None
+    swap_rate: float | None = None
+    avg_entry_swap_rate: float | None = None
     usd: USDPositionValues | None = None
-    qty_available: str | None = None
+    qty_available: float | None = None
 
 
 class AllAccountsPositions(BaseModel):
@@ -228,16 +228,16 @@ class Order(ModelWithID):
     asset_id: UUID
     symbol: str
     asset_class: AssetClass
-    notional: str | None = None
-    qty: str | float | None = None
-    filled_qty: str | float | None = None
-    filled_avg_price: str | float | None = None
+    notional: float | None = None
+    qty: float | None = None
+    filled_qty: float | None = None
+    filled_avg_price: float | None = None
     order_class: OrderClass
     order_type: OrderType = Field(..., alias="type")
     side: OrderSide
     time_in_force: TimeInForce
-    limit_price: str | float | None = None
-    stop_price: str | float | None = None
+    limit_price: float | None = None
+    stop_price: float | None = None
     status: OrderStatus
     extended_hours: bool
     legs: list["Order"] | None = None
@@ -474,17 +474,17 @@ class TradeAccount(ModelWithID):
         crypto_status (Optional[AccountStatus]): The status of the account in regards to trading crypto. Only present if
           crypto trading is enabled for your brokerage account.
         currency (Optional[str]): Currently will always be the value "USD".
-        buying_power (Optional[str]): Current available cash buying power. If multiplier = 2 then
+        buying_power (Optional[float]): Current available cash buying power. If multiplier = 2 then
           buying_power = max(equity-initial_margin(0) * 2). If multiplier = 1 then buying_power = cash.
-        regt_buying_power (Optional[str]): User's buying power under Regulation T
+        regt_buying_power (Optional[float]): User's buying power under Regulation T
           (excess equity - (equity - margin value) - * margin multiplier)
-        daytrading_buying_power (Optional[str]): The buying power for day trades for the account
-        non_marginable_buying_power (Optional[str]): The non marginable buying power for the account
-        cash (Optional[str]): Cash balance in the account
-        accrued_fees (Optional[str]): Fees accrued in this account
+        daytrading_buying_power (Optional[float]): The buying power for day trades for the account
+        non_marginable_buying_power (Optional[float]): The non marginable buying power for the account
+        cash (Optional[float]): Cash balance in the account
+        accrued_fees (Optional[float]): Fees accrued in this account
         pending_transfer_out (Optional[str]): Cash pending transfer out of this account
         pending_transfer_in (Optional[str]): Cash pending transfer into this account
-        portfolio_value (str): Total value of cash + holding positions.
+        portfolio_value (float): Total value of cash + holding positions.
           (This field is deprecated. It is equivalent to the equity field.)
         pattern_day_trader (Optional[bool]): Whether the account is flagged as pattern day trader or not.
         trading_blocked (Optional[bool]): If true, the account is not allowed to place orders.
@@ -492,17 +492,17 @@ class TradeAccount(ModelWithID):
         account_blocked (Optional[bool]): If true, the account activity by user is prohibited.
         created_at (Optional[datetime]): Timestamp this account was created at
         trade_suspended_by_user (Optional[bool]): If true, the account is not allowed to place orders.
-        multiplier (Optional[str]): Multiplier value for this account.
+        multiplier (Optional[int]): Multiplier value for this account.
         shorting_enabled (Optional[bool]): Flag to denote whether or not the account is permitted to short
-        equity (Optional[str]): This value is cash + long_market_value + short_market_value. This value isn't calculated in the
+        equity (Optional[float]): This value is cash + long_market_value + short_market_value. This value isn't calculated in the
           SDK it is computed on the server and we return the raw value here.
-        last_equity (Optional[str]): Equity as of previous trading day at 16:00:00 ET
-        long_market_value (Optional[str]): Real-time MtM value of all long positions held in the account
-        short_market_value (Optional[str]): Real-time MtM value of all short positions held in the account
-        initial_margin (Optional[str]): Reg T initial margin requirement
-        maintenance_margin (Optional[str]): Maintenance margin requirement
-        last_maintenance_margin (Optional[str]): Maintenance margin requirement on the previous trading day
-        sma (Optional[str]): Value of Special Memorandum Account (will be used at a later date to provide additional buying_power)
+        last_equity (Optional[float]): Equity as of previous trading day at 16:00:00 ET
+        long_market_value (Optional[float]): Real-time MtM value of all long positions held in the account
+        short_market_value (Optional[float]): Real-time MtM value of all short positions held in the account
+        initial_margin (Optional[float]): Reg T initial margin requirement
+        maintenance_margin (Optional[float]): Maintenance margin requirement
+        last_maintenance_margin (Optional[float]): Maintenance margin requirement on the previous trading day
+        sma (Optional[float]): Value of Special Memorandum Account (will be used at a later date to provide additional buying_power)
         daytrade_count (Optional[int]): The current number of daytrades that have been made in the last 5 trading days
           (inclusive of today)
     """
@@ -511,11 +511,11 @@ class TradeAccount(ModelWithID):
     status: AccountStatus
     crypto_status: AccountStatus | None = None
     currency: str | None = None
-    buying_power: str | None = None
-    regt_buying_power: str | None = None
-    daytrading_buying_power: str | None = None
-    non_marginable_buying_power: str | None = None
-    cash: str | None = None
+    buying_power: float | None = None
+    regt_buying_power: float | None = None
+    daytrading_buying_power: float | None = None
+    non_marginable_buying_power: float | None = None
+    cash: float | None = None
     accrued_fees: str | None = None
     pending_transfer_out: str | None = None
     pending_transfer_in: str | None = None
@@ -526,16 +526,16 @@ class TradeAccount(ModelWithID):
     account_blocked: bool | None = None
     created_at: datetime | None = None
     trade_suspended_by_user: bool | None = None
-    multiplier: str | None = None
+    multiplier: int | None = None
     shorting_enabled: bool | None = None
-    equity: str | None = None
-    last_equity: str | None = None
-    long_market_value: str | None = None
-    short_market_value: str | None = None
-    initial_margin: str | None = None
-    maintenance_margin: str | None = None
-    last_maintenance_margin: str | None = None
-    sma: str | None = None
+    equity: float | None = None
+    last_equity: float | None = None
+    long_market_value: float | None = None
+    short_market_value: float | None = None
+    initial_margin: float | None = None
+    maintenance_margin: float | None = None
+    last_maintenance_margin: float | None = None
+    sma: float | None = None
     daytrade_count: int | None = None
 
 

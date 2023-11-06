@@ -1,5 +1,6 @@
 """Exceptions module."""
 import json
+import pprint
 
 from pydantic import BaseModel, TypeAdapter, ValidationError
 from requests import Request, Response
@@ -73,8 +74,30 @@ class APIError(Exception):
         -------
         None
         """
-        super().__init__(http_error)
         self._http_error = http_error
+        super().__init__(self.__repr__())
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the APIError instance.
+
+        This method overrides the default `__repr__` method and includes the status code,
+        body, and HTTP error of the APIError instance in the string representation.
+
+        Returns
+        -------
+        str
+            A string representation of the APIError instance.
+        """
+        return pprint.pformat(
+            {
+                "status_code": self.status_code,
+                "body": self.body,
+                "http_error": self._http_error,
+            },
+            sort_dicts=False,
+            compact=True,
+        )
 
     @property
     def request(self) -> Request:
